@@ -1,0 +1,463 @@
+{
+  "info": {
+    "name": "S.P.A.R.T.A Backend API",
+    "_postman_id": "d4c59db2-badc-4af9-aed8-2e680d4c8b5d",
+    "description": "Import this collection to test the S.P.A.R.T.A backend API.\n\nSetup:\n- Select environment **S.P.A.R.T.A Local**\n- Set `baseUrl` (default: http://localhost:8080)\n- Use **Auth → Register** or **Auth → Login** to automatically set `jwt`, `userId`, and `role`\n\nNotes:\n- Most endpoints are protected by JWT. Public endpoints are under the `Public` folder.\n- IDs are stored into environment variables for chaining (exerciseId, splitTemplateId, splitDayId, workoutSessionId).\n- Admin endpoints require JWT claim `role=admin`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Keep a stable YYYY-MM-DD date handy for nutrition + other date inputs.",
+          "pm.environment.set('today', new Date().toISOString().slice(0, 10));",
+          "",
+          "// Normalize jwt env var: Postman Bearer auth expects a raw token string.",
+          "// Common mistake: pasting 'Bearer <token>' into {{jwt}} which becomes 'Bearer Bearer <token>' on the wire.",
+          "const rawJwt = (pm.environment.get('jwt') || '').trim();",
+          "let normalizedJwt = rawJwt;",
+          "if (normalizedJwt.toLowerCase().startsWith('bearer ')) normalizedJwt = normalizedJwt.slice(7).trim();",
+          "// Strip accidental surrounding quotes.",
+          "if (normalizedJwt.startsWith('\"') && normalizedJwt.endsWith('\"')) normalizedJwt = normalizedJwt.slice(1, -1);",
+          "if (normalizedJwt !== rawJwt) pm.environment.set('jwt', normalizedJwt);"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Healthz",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/healthz"
+          }
+        },
+        {
+          "name": "Metrics",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/metrics"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"invite_token\": \"{{inviteToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const j = pm.response.json();",
+                  "pm.test('response has data.token', function () { pm.expect(j).to.have.nested.property('data.token'); });",
+                  "if (j?.data?.token) pm.environment.set('jwt', j.data.token);",
+                  "if (j?.data?.user_id) pm.environment.set('userId', j.data.user_id);",
+                  "if (j?.data?.role) pm.environment.set('role', j.data.role);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test('response has data.token', function () { pm.expect(j).to.have.nested.property('data.token'); });",
+                  "if (j?.data?.token) pm.environment.set('jwt', j.data.token);",
+                  "if (j?.data?.user_id) pm.environment.set('userId', j.data.user_id);",
+                  "if (j?.data?.role) pm.environment.set('role', j.data.role);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Create Admin Invite",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expires_in_hours\": 24\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/invites"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const j = pm.response.json();",
+                  "pm.test('response has data.invite_token', function () { pm.expect(j).to.have.nested.property('data.invite_token'); });",
+                  "if (j?.data?.invite_token) pm.environment.set('adminInviteToken', j.data.invite_token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Create Exercise",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Barbell Bench Press\",\n  \"primary_muscle\": \"chest\",\n  \"secondary_muscles\": [\"triceps\", \"front delts\"],\n  \"equipment\": \"barbell\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/exercises"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const j = pm.response.json();",
+                  "pm.test('response has data.id', function () { pm.expect(j).to.have.nested.property('data.id'); });",
+                  "pm.environment.set('exerciseId', j.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Exercise Media",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"media_type\": \"video\",\n  \"media_url\": \"https://example.com/bench-press.mp4\",\n  \"thumbnail_url\": \"https://example.com/bench-press.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/exercises/{{exerciseId}}/media"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Exercises",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/exercises"
+          }
+        },
+        {
+          "name": "Get Exercise",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/exercises/{{exerciseId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Splits",
+      "item": [
+        {
+          "name": "Create Split Template",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"name\": \"PPL (Test)\",\n  \"description\": \"Push/Pull/Legs template for API testing\",\n  \"created_by\": \"user\",\n  \"focus_muscle\": \"hypertrophy\",\n  \"is_active\": false,\n  \"days\": [\n    {\n      \"day_order\": 1,\n      \"name\": \"Push\",\n      \"exercises\": [\n        {\n          \"exercise_id\": \"{{exerciseId}}\",\n          \"target_sets\": 3,\n          \"target_reps\": 10,\n          \"target_weight\": 60,\n          \"notes\": \"Main press\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/splits"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const j = pm.response.json();",
+                  "pm.environment.set('splitTemplateId', j.data.id);",
+                  "if (j.data.days && j.data.days.length > 0) pm.environment.set('splitDayId', j.data.days[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Split Template",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/splits/{{splitTemplateId}}"
+          }
+        },
+        {
+          "name": "List User Split Templates",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/splits/user/{{userId}}"
+          }
+        },
+        {
+          "name": "Update Split Template",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"PPL (Updated)\",\n  \"description\": \"Updated template via API\",\n  \"focus_muscle\": \"hypertrophy\",\n  \"is_active\": false,\n  \"days\": [\n    {\n      \"day_order\": 1,\n      \"name\": \"Push\",\n      \"exercises\": [\n        {\n          \"exercise_id\": \"{{exerciseId}}\",\n          \"target_sets\": 4,\n          \"target_reps\": 8,\n          \"target_weight\": 62.5,\n          \"notes\": \"Slightly heavier\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/splits/{{splitTemplateId}}"
+          }
+        },
+        {
+          "name": "Activate Split Template",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/splits/{{splitTemplateId}}/activate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workouts",
+      "item": [
+        {
+          "name": "Create Workout Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"split_day_id\": \"{{splitDayId}}\",\n  \"session_date\": \"{{today}}\",\n  \"duration_minutes\": 60,\n  \"notes\": \"Test session\",\n  \"exercises\": [\n    {\n      \"exercise_id\": \"{{exerciseId}}\",\n      \"sets\": [\n        {\n          \"set_order\": 1,\n          \"reps\": 10,\n          \"weight\": 60,\n          \"rpe\": 7.5,\n          \"set_type\": \"working\"\n        },\n        {\n          \"set_order\": 2,\n          \"reps\": 9,\n          \"weight\": 60,\n          \"rpe\": 8,\n          \"set_type\": \"working\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/workouts"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 201', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const j = pm.response.json();",
+                  "if (j && j.data && j.data.id) pm.environment.set('workoutSessionId', j.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Workout Session",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/workouts/{{workoutSessionId}}"
+          }
+        },
+        {
+          "name": "List User Workout Sessions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/workouts/user/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Nutrition",
+      "item": [
+        {
+          "name": "Upsert Daily Nutrition",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"date\": \"{{today}}\",\n  \"protein_grams\": 150,\n  \"calories\": 2200,\n  \"notes\": \"High protein day\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/nutrition"
+          }
+        },
+        {
+          "name": "Get Daily Nutrition",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/nutrition/user/{{userId}}?date={{today}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Planner",
+      "item": [
+        {
+          "name": "Generate Planner Recommendation (AI coaching + save)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/planner/generate/{{userId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 200', function () { pm.expect(pm.response.code).to.eql(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List User Planner Recommendations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/planner/user/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Generate Split (AI)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"days_per_week\": 4,\n  \"focus_muscle\": \"hypertrophy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/ai/generate-split"
+          }
+        },
+        {
+          "name": "Suggest Overload (AI)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exercise_id\": \"{{exerciseId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/ai/overload"
+          }
+        },
+        {
+          "name": "Generate Workout Plan (AI)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"split_day_id\": \"{{splitDayId}}\",\n  \"fatigue\": 4\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/ai/workout"
+          }
+        },
+        {
+          "name": "Daily Motivation (AI)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/ai/motivation"
+          }
+        },
+        {
+          "name": "Coaching Suggestions (AI)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/ai/coaching"
+          }
+        },
+        {
+          "name": "Explain Workout Plan (AI)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"split_day_name\": \"Push\",\n  \"fatigue\": 4,\n  \"exercises\": [\n    {\n      \"name\": \"Barbell Bench Press\",\n      \"sets\": 3,\n      \"rep_range\": \"8-10\",\n      \"weight\": 60\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/ai/explain-workout"
+          }
+        }
+      ]
+    }
+  ]
+}

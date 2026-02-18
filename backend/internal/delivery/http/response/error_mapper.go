@@ -1,22 +1,23 @@
 package response
 
 import (
+	"errors"
 	"net/http"
 
 	domainerr "S.P.A.R.T.A/backend/internal/domain/errors"
 )
 
 func MapErrorToStatus(err error) int {
-	switch err {
-	case domainerr.ErrNotFound:
+	switch {
+	case errors.Is(err, domainerr.ErrNotFound):
 		return http.StatusNotFound
-	case domainerr.ErrInvalidInput:
+	case errors.Is(err, domainerr.ErrInvalidInput):
 		return http.StatusBadRequest
-	case domainerr.ErrUnauthorized:
+	case errors.Is(err, domainerr.ErrUnauthorized):
 		return http.StatusUnauthorized
-	case domainerr.ErrForbidden:
+	case errors.Is(err, domainerr.ErrForbidden):
 		return http.StatusForbidden
-	case domainerr.ErrConflict:
+	case errors.Is(err, domainerr.ErrConflict):
 		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError

@@ -6,6 +6,10 @@
 *.so
 *.dylib
 
+# --- Next ---
+node_modules
+.next
+
 # Test binaries / profiles
 *.test
 *.out

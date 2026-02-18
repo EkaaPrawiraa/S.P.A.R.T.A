@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
-	"errors"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/workout"
+	domainerr "S.P.A.R.T.A/backend/internal/domain/errors"
 	domainrepo "S.P.A.R.T.A/backend/internal/domain/repository"
 	domainuc "S.P.A.R.T.A/backend/internal/domain/usecase"
 )
@@ -27,11 +27,11 @@ func (u *workoutUsecase) CreateWorkoutSession(
 ) error {
 
 	if session.UserID == "" {
-		return errors.New("user id required")
+		return domainerr.ErrInvalidInput
 	}
 
 	if len(session.Exercises) == 0 {
-		return errors.New("workout must contain exercises")
+		return domainerr.ErrInvalidInput
 	}
 
 	return u.workoutRepo.CreateSession(ctx, session)

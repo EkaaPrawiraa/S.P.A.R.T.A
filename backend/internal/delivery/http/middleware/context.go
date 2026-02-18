@@ -7,5 +7,9 @@ func GetUserID(c *gin.Context) string {
 	if !exists {
 		return ""
 	}
-	return val.(string)
+	s, ok := val.(string)
+	if !ok {
+		return ""
+	}
+	return s
 }

@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/planner"
+	domainerr "S.P.A.R.T.A/backend/internal/domain/errors"
 	domainrepo "S.P.A.R.T.A/backend/internal/domain/repository"
 )
 
@@ -24,5 +26,41 @@ func (r *plannerRepository) SaveRecommendation(ctx context.Context, rec *planner
 }
 
 func (r *plannerRepository) GetUserRecommendations(ctx context.Context, userID string) ([]planner.PlannerRecommendation, error) {
-	return nil, nil
+	rows, err := r.db.QueryContext(ctx,
+		`SELECT id,user_id,workout_session_id,recommendation,recommendation_type,created_at
+		 FROM planner_recommendations
+		 WHERE user_id=$1
+		 ORDER BY created_at DESC
+		 LIMIT 50`,
+		userID,
+	)
+	if err != nil {
+		return nil, domainerr.ErrInternal
+	}
+	defer rows.Close()
+
+	items := make([]planner.PlannerRecommendation, 0)
+	for rows.Next() {
+		var rec planner.PlannerRecommendation
+		var workoutSessionID sql.NullString
+		if err := rows.Scan(
+			&rec.ID,
+			&rec.UserID,
+			&workoutSessionID,
+			&rec.Recommendation,
+			&rec.RecommendationType,
+			&rec.CreatedAt,
+		); err != nil {
+			return nil, domainerr.ErrInternal
+		}
+		if workoutSessionID.Valid {
+			s := workoutSessionID.String
+			rec.WorkoutSessionID = &s
+		}
+		items = append(items, rec)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, domainerr.ErrInternal
+	}
+	return items, nil
 }

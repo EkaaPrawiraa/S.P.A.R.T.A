@@ -97,6 +97,9 @@ CREATE TABLE daily_nutritions (
     notes TEXT
 );
 
+CREATE UNIQUE INDEX daily_nutritions_user_date_uidx
+    ON daily_nutritions(user_id, date);
+
 -- AI RECOMMENDATIONS
 CREATE TABLE planner_recommendations (
     id UUID PRIMARY KEY,

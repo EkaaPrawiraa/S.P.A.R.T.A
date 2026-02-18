@@ -14,6 +14,7 @@ type Exercise struct {
 
 type ExerciseMedia struct {
 	ID           string
+	ExerciseID   string
 	MediaType    string
 	MediaURL     string
 	ThumbnailURL *string

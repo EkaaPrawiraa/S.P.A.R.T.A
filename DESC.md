@@ -410,3 +410,7 @@ Now we make this **AI-first**, not AI-addon.
 
 ---
 
+
+
+## Muscle
+Muscle = {upper chest, middlechest, lower chest, upper back, middle back,lower back, front delt shoulder, side delt shoulder, back delt shoulder, traps, lats, abs, quads, glute, calf, forearm,long head tricep, short head tricep, brachialis, short head bicep, long head bicep, etc}
