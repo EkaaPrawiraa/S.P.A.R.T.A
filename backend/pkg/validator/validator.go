@@ -1,10 +1,11 @@
 package validator
 
-import "errors"
+import (
+    "github.com/go-playground/validator/v10"
+)
 
-func Require(value string, field string) error {
-	if value == "" {
-		return errors.New(field + " is required")
-	}
-	return nil
+var validate = validator.New()
+
+func ValidateStruct(s interface{}) error {
+    return validate.Struct(s)
 }

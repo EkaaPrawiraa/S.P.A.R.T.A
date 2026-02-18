@@ -2,6 +2,7 @@ package route
 
 import (
 	"S.P.A.R.T.A/backend/internal/delivery/http/handler"
+	"S.P.A.R.T.A/backend/internal/delivery/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,11 +12,22 @@ func SetupRouter(
 	nutritionHandler *handler.NutritionHandler,
 	plannerHandler *handler.PlannerHandler,
 	exerciseHandler *handler.ExerciseHandler,
+	AICoachHandler  *handler.AICoachHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
+	
+	authMW := middleware.NewAuthMiddleware("SUPER_SECRET")
 
-	api := r.Group("/api")
+	api := r.Group("/api/v1")
+
+	// public routes
+    api.GET("/health", func(c *gin.Context) {
+        c.JSON(200, gin.H{"status": "ok"})
+    })
+
+	secured := api.Group("/")
+    secured.Use(authMW.RequireAuth())
 
 	// workouts
 	workouts := api.Group("/workouts")
@@ -51,6 +63,13 @@ func SetupRouter(
 	{
 		exercises.GET("", exerciseHandler.ListExercises)
 		exercises.GET("/:id", exerciseHandler.GetExercise)
+	}
+
+	// ai
+	ai := api.Group("/ai")
+	{
+		ai.POST("/ai/generate-split", AICoachHandler.GenerateSplit)
+		ai.POST("/ai/overload", AICoachHandler.SuggestOverload)
 	}
 
 	return r
