@@ -71,6 +71,8 @@ temp/
 *.swp
 *.swo
 *~
+DESC.md
+context.md
 
 # --- Local DB / runtime artifacts (if any) ---
 *.sqlite

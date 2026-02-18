@@ -7,6 +7,6 @@ import (
 )
 
 type PlannerRepository interface {
-    SaveRecommendation(ctx context.Context, rec *planner.PlannerRecommendation) error
-    GetUserRecommendations(ctx context.Context, userID string) ([]planner.PlannerRecommendation, error)
+	SaveRecommendation(ctx context.Context, rec *planner.PlannerRecommendation) error
+	GetUserRecommendations(ctx context.Context, userID string) ([]planner.PlannerRecommendation, error)
 }

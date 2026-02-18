@@ -2,17 +2,16 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/exercise"
 	domainrepo "S.P.A.R.T.A/backend/internal/domain/repository"
 )
 
 type exerciseRepository struct {
-	db *sql.DB
+	db DBTX
 }
 
-func NewExerciseRepository(db *sql.DB) domainrepo.ExerciseRepository {
+func NewExerciseRepository(db DBTX) domainrepo.ExerciseRepository {
 	return &exerciseRepository{db: db}
 }
 

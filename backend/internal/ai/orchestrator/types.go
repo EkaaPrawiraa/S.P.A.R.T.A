@@ -26,10 +26,10 @@ type SplitExerciseOutput struct {
 }
 
 type WorkoutInput struct {
-	UserID      string
-	SplitDayID  string
-	Fatigue     int
-	LastVolume  int
+	UserID     string
+	SplitDayID string
+	Fatigue    int
+	LastVolume int
 }
 
 type WorkoutOutput struct {

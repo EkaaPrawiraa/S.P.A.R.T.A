@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/workout"
@@ -10,10 +9,10 @@ import (
 )
 
 type workoutRepository struct {
-	db *sql.DB
+	db DBTX
 }
 
-func NewWorkoutRepository(db *sql.DB) domainrepo.WorkoutRepository {
+func NewWorkoutRepository(db DBTX) domainrepo.WorkoutRepository {
 	return &workoutRepository{db: db}
 }
 
@@ -22,24 +21,13 @@ func (r *workoutRepository) CreateSession(
 	session *workout.WorkoutSession,
 ) error {
 
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
 	sessionQuery := `
 		INSERT INTO workout_sessions
 		(id, user_id, split_day_id, session_date, duration_minutes, notes, created_at)
 		VALUES ($1,$2,$3,$4,$5,$6,$7)
 	`
 
-	_, err = tx.ExecContext(
+	_, err := r.db.ExecContext(
 		ctx,
 		sessionQuery,
 		session.ID,
@@ -62,7 +50,7 @@ func (r *workoutRepository) CreateSession(
 			VALUES ($1,$2,$3)
 		`
 
-		_, err = tx.ExecContext(
+		_, err = r.db.ExecContext(
 			ctx,
 			exQuery,
 			ex.ID,
@@ -81,7 +69,7 @@ func (r *workoutRepository) CreateSession(
 				VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
 			`
 
-			_, err = tx.ExecContext(
+			_, err = r.db.ExecContext(
 				ctx,
 				setQuery,
 				set.ID,
@@ -97,10 +85,6 @@ func (r *workoutRepository) CreateSession(
 				return err
 			}
 		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		return fmt.Errorf("commit failed: %w", err)
 	}
 
 	return nil

@@ -8,4 +8,3 @@ Given the athlete's last performance, return STRICT JSON:
 	"action": "increase|maintain|decrease",
 	"message": "..."
 }`
-

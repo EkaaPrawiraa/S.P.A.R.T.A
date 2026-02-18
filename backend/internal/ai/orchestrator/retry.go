@@ -33,4 +33,3 @@ func WithRetry(ctx context.Context, cfg RetryConfig, fn func(context.Context) er
 	}
 	return lastErr
 }
-

@@ -2,17 +2,16 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/split"
 	domainrepo "S.P.A.R.T.A/backend/internal/domain/repository"
 )
 
 type splitRepository struct {
-	db *sql.DB
+	db DBTX
 }
 
-func NewSplitRepository(db *sql.DB) domainrepo.SplitRepository {
+func NewSplitRepository(db DBTX) domainrepo.SplitRepository {
 	return &splitRepository{db: db}
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"S.P.A.R.T.A/backend/configs"
+	"S.P.A.R.T.A/backend/internal/ai/orchestrator"
 	"S.P.A.R.T.A/backend/internal/client"
 	httpHandler "S.P.A.R.T.A/backend/internal/delivery/http/handler"
 	"S.P.A.R.T.A/backend/internal/delivery/http/route"
@@ -42,7 +43,6 @@ func main() {
 	// =========================
 	// Repositories
 	// =========================
-	userRepo := postgresRepo.NewUserRepository(db)
 	exerciseRepo := postgresRepo.NewExerciseRepository(db)
 	workoutRepo := postgresRepo.NewWorkoutRepository(db)
 	splitRepo := postgresRepo.NewSplitRepository(db)
@@ -55,8 +55,11 @@ func main() {
 	workoutUC := ucImpl.NewWorkoutUsecase(workoutRepo)
 	splitUC := ucImpl.NewSplitUsecase(splitRepo)
 	nutritionUC := ucImpl.NewNutritionUsecase(nutritionRepo)
-	plannerUC := ucImpl.NewPlannerUsecase(plannerRepo, openaiClient)
+	plannerUC := ucImpl.NewPlannerUsecase(plannerRepo)
 	exerciseUC := ucImpl.NewExerciseUsecase(exerciseRepo)
+
+	aiOrchestrator := orchestrator.NewOrchestrator(openaiClient)
+	aiCoachUC := ucImpl.NewAICoachUsecase(aiOrchestrator, splitRepo, plannerRepo)
 
 	// =========================
 	// Handlers
@@ -66,6 +69,7 @@ func main() {
 	nutritionHandler := httpHandler.NewNutritionHandler(nutritionUC)
 	plannerHandler := httpHandler.NewPlannerHandler(plannerUC)
 	exerciseHandler := httpHandler.NewExerciseHandler(exerciseUC)
+	aiCoachHandler := httpHandler.NewAICoachHandler(aiCoachUC)
 
 	// =========================
 	// Router
@@ -76,6 +80,7 @@ func main() {
 		nutritionHandler,
 		plannerHandler,
 		exerciseHandler,
+		aiCoachHandler,
 	)
 
 	// =========================

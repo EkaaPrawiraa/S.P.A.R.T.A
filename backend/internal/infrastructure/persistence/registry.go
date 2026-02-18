@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"S.P.A.R.T.A/backend/internal/domain/repository"
+	postgresRepo "S.P.A.R.T.A/backend/internal/repository/postgres"
 )
 
 type registry struct {
@@ -15,17 +16,17 @@ func NewRegistry(tx *sql.Tx) repository.Registry {
 }
 
 func (r *registry) User() repository.UserRepository {
-	return NewUserRepository(r.tx)
+	return postgresRepo.NewUserRepository(r.tx)
 }
 
 func (r *registry) Workout() repository.WorkoutRepository {
-	return NewWorkoutRepository(r.tx)
+	return postgresRepo.NewWorkoutRepository(r.tx)
 }
 
 func (r *registry) Split() repository.SplitRepository {
-	return NewSplitRepository(r.tx)
+	return postgresRepo.NewSplitRepository(r.tx)
 }
 
 func (r *registry) Exercise() repository.ExerciseRepository {
-	return NewExerciseRepository(r.tx)
+	return postgresRepo.NewExerciseRepository(r.tx)
 }

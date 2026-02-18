@@ -1,8 +1,8 @@
 package dto
 
 type SplitTemplate struct {
-	Name  string
-	Days  []SplitDay
+	Name string
+	Days []SplitDay
 }
 
 type SplitDay struct {
@@ -12,8 +12,8 @@ type SplitDay struct {
 }
 
 type SplitExercise struct {
-	Name       string
-	Sets       int
-	RepRange   string
-	Priority   string
+	Name     string
+	Sets     int
+	RepRange string
+	Priority string
 }

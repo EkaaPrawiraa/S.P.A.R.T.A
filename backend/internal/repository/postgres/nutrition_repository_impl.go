@@ -2,17 +2,16 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 
 	"S.P.A.R.T.A/backend/internal/domain/aggregate/nutrition"
 	domainrepo "S.P.A.R.T.A/backend/internal/domain/repository"
 )
 
 type nutritionRepository struct {
-	db *sql.DB
+	db DBTX
 }
 
-func NewNutritionRepository(db *sql.DB) domainrepo.NutritionRepository {
+func NewNutritionRepository(db DBTX) domainrepo.NutritionRepository {
 	return &nutritionRepository{db: db}
 }
 

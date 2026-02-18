@@ -1,9 +1,9 @@
 package persistence
 
 import (
+	"S.P.A.R.T.A/backend/internal/domain/repository"
 	"context"
 	"database/sql"
-	"S.P.A.R.T.A/backend/internal/domain/repository"
 )
 
 type unitOfWork struct {

@@ -60,15 +60,15 @@ func (u *aiCoachUsecase) GenerateSplitTemplate(
 	for i, d := range aiResult.Days {
 		day := split.SplitDay{
 			ID:       uuid.NewString(),
-			DayOrder:        i + 1,
-			Name:            d.DayName,
+			DayOrder: i + 1,
+			Name:     d.DayName,
 		}
 
 		for _, ex := range d.Exercises {
 			day.Exercises = append(day.Exercises, split.SplitExercise{
-				TargetSets:  ex.Sets,
-				TargetReps:  parseRepRange(ex.RepRange),
-				Notes:       ex.Name,
+				TargetSets: ex.Sets,
+				TargetReps: parseRepRange(ex.RepRange),
+				Notes:      ex.Name,
 			})
 		}
 

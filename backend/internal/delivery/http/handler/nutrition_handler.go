@@ -24,7 +24,7 @@ func (h *NutritionHandler) UpsertDailyNutrition(c *gin.Context) {
 		return
 	}
 
-	if err := h.uc.UpsertDailyNutrition(c.Request.Context(), &req); err != nil {
+	if err := h.uc.SaveDaily(c.Request.Context(), &req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -36,7 +36,7 @@ func (h *NutritionHandler) GetDailyNutrition(c *gin.Context) {
 	userID := c.Param("user_id")
 	date := c.Query("date")
 
-	res, err := h.uc.GetDailyNutrition(c.Request.Context(), userID, date)
+	res, err := h.uc.GetByDate(c.Request.Context(), userID, date)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return

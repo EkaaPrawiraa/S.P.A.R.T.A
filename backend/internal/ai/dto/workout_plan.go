@@ -1,7 +1,7 @@
 package dto
 
 type WorkoutPlan struct {
-	DayName   string          `json:"day_name"`
+	DayName   string            `json:"day_name"`
 	Exercises []WorkoutExercise `json:"exercises"`
 }
 
@@ -11,4 +11,3 @@ type WorkoutExercise struct {
 	RepRange string  `json:"rep_range"`
 	Weight   float64 `json:"weight"`
 }
-

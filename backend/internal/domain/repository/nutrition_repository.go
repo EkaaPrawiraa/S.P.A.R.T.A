@@ -7,6 +7,6 @@ import (
 )
 
 type NutritionRepository interface {
-    SaveDaily(ctx context.Context, n *nutrition.DailyNutrition) error
-    GetByDate(ctx context.Context, userID string, date string) (*nutrition.DailyNutrition, error)
+	SaveDaily(ctx context.Context, n *nutrition.DailyNutrition) error
+	GetByDate(ctx context.Context, userID string, date string) (*nutrition.DailyNutrition, error)
 }
