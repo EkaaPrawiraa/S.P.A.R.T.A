@@ -31,15 +31,15 @@ type wgerPaginatedResponse[T any] struct {
 }
 
 type WgerExerciseInfo struct {
-	ID               int       `json:"id"`
-	UUID             string    `json:"uuid"`
-	Category         wgerNamed  `json:"category"`
-	Muscles          []wgerNamed `json:"muscles"`
-	MusclesSecondary []wgerNamed `json:"muscles_secondary"`
-	Equipment        []wgerNamed `json:"equipment"`
-	Images           []WgerExerciseImage `json:"images"`
+	ID               int                       `json:"id"`
+	UUID             string                    `json:"uuid"`
+	Category         wgerNamed                 `json:"category"`
+	Muscles          []wgerNamed               `json:"muscles"`
+	MusclesSecondary []wgerNamed               `json:"muscles_secondary"`
+	Equipment        []wgerNamed               `json:"equipment"`
+	Images           []WgerExerciseImage       `json:"images"`
 	Translations     []WgerExerciseTranslation `json:"translations"`
-	Videos           []WgerExerciseVideo `json:"videos"`
+	Videos           []WgerExerciseVideo       `json:"videos"`
 }
 
 type wgerNamed struct {

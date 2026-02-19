@@ -42,6 +42,14 @@ func (r *motivationRepository) SetDailyMotivation(ctx context.Context, userID st
 	return nil
 }
 
+func (r *motivationRepository) DeleteDailyMotivation(ctx context.Context, userID string, date time.Time) error {
+	key := motivationKey(userID, date)
+	if err := r.client.Del(ctx, key).Err(); err != nil {
+		return domainerr.ErrInternal
+	}
+	return nil
+}
+
 func motivationKey(userID string, date time.Time) string {
 	return fmt.Sprintf("motivation:%s:%s", userID, date.UTC().Format("2006-01-02"))
 }

@@ -3,10 +3,12 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { DailyMotivationResponseDTO } from "@/lib/backend-dto";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface HeroSectionProps {
   onScroll?: () => void;
@@ -22,27 +24,44 @@ export function HeroSection({ onScroll }: HeroSectionProps) {
 
   const [quote, setQuote] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const cancelledRef = useRef(false);
+
+  const refreshMotivation = async (opts?: { silent?: boolean }) => {
+    try {
+      if (!opts?.silent && !cancelledRef.current) setIsLoading(true);
+      const data = await api.get<DailyMotivationResponseDTO>(
+        "/api/v1/ai/motivation",
+      );
+      if (!cancelledRef.current) setQuote(data.message);
+    } catch {
+      if (!cancelledRef.current) setQuote("");
+    } finally {
+      if (!opts?.silent && !cancelledRef.current) setIsLoading(false);
+    }
+  };
+
+  const handleResetQuote = async () => {
+    try {
+      if (!cancelledRef.current) setIsLoading(true);
+      await api.post("/api/v1/ai/motivation/reset");
+      await refreshMotivation({ silent: true });
+      toast.success("Motivation quote reset");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to reset quote";
+      toast.error(message);
+    } finally {
+      if (!cancelledRef.current) setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function loadMotivation() {
-      try {
-        setIsLoading(true);
-        const data = await api.get<DailyMotivationResponseDTO>(
-          "/api/v1/ai/motivation",
-        );
-        if (!cancelled) setQuote(data.message);
-      } catch {
-        if (!cancelled) setQuote("");
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    loadMotivation();
+    cancelledRef.current = false;
+    refreshMotivation().catch(() => {
+      // handled inside refreshMotivation
+    });
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, []);
 
@@ -77,6 +96,17 @@ export function HeroSection({ onScroll }: HeroSectionProps) {
         </div>
 
         <p className="text-lg text-muted-foreground mb-8">{today}</p>
+
+        <div className="mb-8">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleResetQuote}
+            disabled={isLoading}
+          >
+            Motivate Me
+          </Button>
+        </div>
 
         <p className="text-sm text-muted-foreground uppercase tracking-wider">
           Scroll to Dashboard

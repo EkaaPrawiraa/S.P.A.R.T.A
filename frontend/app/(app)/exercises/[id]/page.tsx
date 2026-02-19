@@ -17,6 +17,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { ExerciseResponseDTO } from "@/lib/backend-dto";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+
+function isLikelyImageUrl(url: string): boolean {
+  const u = url.toLowerCase();
+  return (
+    u.endsWith(".png") ||
+    u.endsWith(".jpg") ||
+    u.endsWith(".jpeg") ||
+    u.endsWith(".gif") ||
+    u.endsWith(".webp") ||
+    u.endsWith(".svg")
+  );
+}
+
+function isLikelyVideoUrl(url: string): boolean {
+  const u = url.toLowerCase();
+  return u.endsWith(".mp4") || u.endsWith(".webm") || u.endsWith(".ogg");
+}
 
 export default function ExerciseDetailPage() {
   const params = useParams();
@@ -127,24 +145,61 @@ export default function ExerciseDetailPage() {
               <CardTitle>Media</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {exercise.media.map((m) => (
-                  <li
-                    key={m.id}
-                    className="flex items-center gap-2 text-sm text-muted-foreground"
-                  >
-                    <LinkIcon className="h-4 w-4" />
-                    <a
-                      href={m.media_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-primary"
-                    >
-                      {m.media_url}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <div className="grid grid-cols-1 gap-6">
+                {exercise.media.map((m) => {
+                  const canPreviewImage =
+                    m.media_type === "image" || isLikelyImageUrl(m.media_url);
+                  const canPreviewVideo =
+                    m.media_type === "video" || isLikelyVideoUrl(m.media_url);
+
+                  return (
+                    <div key={m.id} className="space-y-3">
+                      {canPreviewImage ? (
+                        <div className="overflow-hidden rounded-md border border-border">
+                          <AspectRatio ratio={16 / 9}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={m.media_url}
+                              alt={`${exercise.name} media`}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          </AspectRatio>
+                        </div>
+                      ) : canPreviewVideo ? (
+                        <div className="overflow-hidden rounded-md border border-border">
+                          <AspectRatio ratio={16 / 9}>
+                            <video
+                              className="h-full w-full"
+                              controls
+                              preload="metadata"
+                              poster={m.thumbnail_url ?? undefined}
+                            >
+                              <source src={m.media_url} />
+                            </video>
+                          </AspectRatio>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Preview not available for this media URL.
+                        </p>
+                      )}
+
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <LinkIcon className="h-4 w-4" />
+                        <a
+                          href={m.media_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="break-all hover:text-primary"
+                        >
+                          {m.media_url}
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         )}

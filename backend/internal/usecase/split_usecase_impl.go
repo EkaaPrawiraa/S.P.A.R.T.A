@@ -28,6 +28,10 @@ func (u *splitUsecase) ActivateTemplate(ctx context.Context, userID string, temp
 	return u.repo.ActivateTemplate(ctx, userID, templateID)
 }
 
+func (u *splitUsecase) DeactivateTemplate(ctx context.Context, userID string, templateID string) error {
+	return u.repo.DeactivateTemplate(ctx, userID, templateID)
+}
+
 func (u *splitUsecase) GetTemplate(ctx context.Context, id string) (*split.SplitTemplate, error) {
 	return u.repo.GetTemplateByID(ctx, id)
 }

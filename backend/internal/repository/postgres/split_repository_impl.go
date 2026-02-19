@@ -172,6 +172,26 @@ func (r *splitRepository) ActivateTemplate(ctx context.Context, userID string, t
 	return nil
 }
 
+func (r *splitRepository) DeactivateTemplate(ctx context.Context, userID string, templateID string) error {
+	if userID == "" || templateID == "" {
+		return domainerr.ErrInvalidInput
+	}
+
+	res, err := r.db.ExecContext(ctx,
+		`UPDATE split_templates SET is_active=false WHERE id=$1 AND user_id=$2`,
+		templateID,
+		userID,
+	)
+	if err != nil {
+		return domainerr.ErrInternal
+	}
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		return domainerr.ErrNotFound
+	}
+	return nil
+}
+
 func (r *splitRepository) GetTemplateByID(ctx context.Context, id string) (*split.SplitTemplate, error) {
 	row := r.db.QueryRowContext(ctx,
 		`SELECT id,user_id,name,description,created_by,focus_muscle,is_active,created_at
@@ -306,9 +326,11 @@ func (r *splitRepository) getDays(ctx context.Context, templateID string) ([]spl
 
 func (r *splitRepository) getDayExercises(ctx context.Context, dayID string) ([]split.SplitExercise, error) {
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT COALESCE(exercise_id::text,''), target_sets, target_reps, COALESCE(target_weight,0), COALESCE(notes,'')
-		 FROM split_day_exercises
-		 WHERE split_day_id=$1`,
+		`SELECT COALESCE(sde.exercise_id::text,''), COALESCE(e.name,''), sde.target_sets, sde.target_reps, COALESCE(sde.target_weight,0), COALESCE(sde.notes,'')
+		 FROM split_day_exercises sde
+		 LEFT JOIN exercises e ON e.id = sde.exercise_id
+		 WHERE sde.split_day_id=$1
+		 ORDER BY sde.created_at ASC`,
 		dayID,
 	)
 	if err != nil {
@@ -319,7 +341,7 @@ func (r *splitRepository) getDayExercises(ctx context.Context, dayID string) ([]
 	items := make([]split.SplitExercise, 0)
 	for rows.Next() {
 		var ex split.SplitExercise
-		if err := rows.Scan(&ex.ExerciseID, &ex.TargetSets, &ex.TargetReps, &ex.TargetWeight, &ex.Notes); err != nil {
+		if err := rows.Scan(&ex.ExerciseID, &ex.ExerciseName, &ex.TargetSets, &ex.TargetReps, &ex.TargetWeight, &ex.Notes); err != nil {
 			return nil, domainerr.ErrInternal
 		}
 		items = append(items, ex)

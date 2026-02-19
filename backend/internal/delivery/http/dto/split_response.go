@@ -8,6 +8,7 @@ import (
 
 type SplitExerciseResponseDTO struct {
 	ExerciseID   string  `json:"exercise_id"`
+	ExerciseName string  `json:"exercise_name"`
 	TargetSets   int     `json:"target_sets"`
 	TargetReps   int     `json:"target_reps"`
 	TargetWeight float64 `json:"target_weight"`
@@ -54,6 +55,7 @@ func FromDomainSplitTemplate(t split.SplitTemplate) SplitTemplateResponseDTO {
 		for _, ex := range day.Exercises {
 			dayOut.Exercises = append(dayOut.Exercises, SplitExerciseResponseDTO{
 				ExerciseID:   ex.ExerciseID,
+				ExerciseName: ex.ExerciseName,
 				TargetSets:   ex.TargetSets,
 				TargetReps:   ex.TargetReps,
 				TargetWeight: ex.TargetWeight,

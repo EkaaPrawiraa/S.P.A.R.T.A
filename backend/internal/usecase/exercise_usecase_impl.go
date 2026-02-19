@@ -54,5 +54,11 @@ func (u *exerciseUsecase) ListExercises(ctx context.Context) ([]exercise.Exercis
 }
 
 func (u *exerciseUsecase) AddExerciseMedia(ctx context.Context, media *exercise.ExerciseMedia) error {
-	return u.repo.AddMedia(ctx, media)
+	if err := u.repo.AddMedia(ctx, media); err != nil {
+		return err
+	}
+	if u.cacheRepo != nil {
+		_ = u.cacheRepo.DeleteExerciseList(ctx)
+	}
+	return nil
 }

@@ -23,6 +23,7 @@ type SplitDay struct {
 
 type SplitExercise struct {
 	ExerciseID   string
+	ExerciseName string
 	TargetSets   int
 	TargetReps   int
 	TargetWeight float64

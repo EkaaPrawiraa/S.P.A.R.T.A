@@ -132,6 +132,79 @@ export default function SplitDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {(split.days || [])
+              .slice()
+              .sort((a, b) => (a.day_order ?? 0) - (b.day_order ?? 0))
+              .map((day, idx) => (
+                <div key={day.id} className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      Day {day.day_order || idx + 1}
+                    </p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {day.name || `Day ${day.day_order || idx + 1}`}
+                    </p>
+                  </div>
+
+                  {(day.exercises || []).length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No exercises
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {day.exercises.map((ex, exIdx) => {
+                        const title =
+                          ex.exercise_name?.trim() ||
+                          ex.notes?.trim() ||
+                          ex.exercise_id ||
+                          `Exercise ${exIdx + 1}`;
+
+                        const showNotes =
+                          !!ex.notes &&
+                          ex.notes.trim().length > 0 &&
+                          (ex.exercise_name?.trim()?.length || 0) > 0;
+
+                        const setText = `${ex.target_sets} × ${ex.target_reps}`;
+                        const weightText =
+                          ex.target_weight && ex.target_weight > 0
+                            ? ` @ ${ex.target_weight}`
+                            : "";
+
+                        return (
+                          <div
+                            key={`${day.id}-${ex.exercise_id}-${exIdx}`}
+                            className="rounded-md border p-3"
+                          >
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                              <p className="font-medium text-foreground line-clamp-2">
+                                {title}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {setText}
+                                {weightText}
+                              </p>
+                            </div>
+
+                            {showNotes && (
+                              <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">
+                                {ex.notes}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

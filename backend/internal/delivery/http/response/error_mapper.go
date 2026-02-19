@@ -19,6 +19,8 @@ func MapErrorToStatus(err error) int {
 		return http.StatusForbidden
 	case errors.Is(err, domainerr.ErrConflict):
 		return http.StatusConflict
+	case errors.Is(err, domainerr.ErrAIUnavailable):
+		return http.StatusServiceUnavailable
 	default:
 		return http.StatusInternalServerError
 	}

@@ -56,5 +56,5 @@ func (r *exerciseCacheRepository) DeleteExerciseList(ctx context.Context) error 
 }
 
 func exerciseListKey() string {
-	return "exercises:list"
+	return "exercises:list:v2"
 }

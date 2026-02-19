@@ -134,3 +134,24 @@ func (h *SplitHandler) ActivateTemplate(c *gin.Context) {
 
 	response.Success(c, gin.H{"activated": true})
 }
+
+func (h *SplitHandler) DeactivateTemplate(c *gin.Context) {
+	templateID := c.Param("id")
+	if _, err := uuid.Parse(templateID); err != nil {
+		response.BadRequest(c, "invalid template id")
+		return
+	}
+
+	userID := middleware.GetUserID(c)
+	if userID == "" {
+		response.Error(c, domainerr.ErrUnauthorized)
+		return
+	}
+
+	if err := h.uc.DeactivateTemplate(c.Request.Context(), userID, templateID); err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	response.Success(c, gin.H{"deactivated": true})
+}

@@ -276,6 +276,14 @@ func (u *aiCoachUsecase) GetDailyMotivation(ctx context.Context, userID uuid.UUI
 	return msg, nil
 }
 
+func (u *aiCoachUsecase) ResetDailyMotivation(ctx context.Context, userID uuid.UUID) error {
+	if u.motivationRepo == nil {
+		return nil
+	}
+	now := time.Now().UTC()
+	return u.motivationRepo.DeleteDailyMotivation(ctx, userID.String(), now)
+}
+
 func (u *aiCoachUsecase) GenerateWorkoutPlan(
 	ctx context.Context,
 	userID uuid.UUID,

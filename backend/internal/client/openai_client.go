@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -51,7 +52,7 @@ type ChatResponse struct {
 
 func (c *OpenAIClient) Generate(ctx context.Context, prompt string) (string, error) {
 	if strings.TrimSpace(c.apiKey) == "" {
-		return "", domainerr.ErrInternal
+		return "", domainerr.ErrAIUnavailable
 	}
 
 	reqBody := ChatRequest{
@@ -77,25 +78,37 @@ func (c *OpenAIClient) Generate(ctx context.Context, prompt string) (string, err
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return "", domainerr.ErrInternal
+		return "", fmt.Errorf("%w: request failed", domainerr.ErrAIUnavailable)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", domainerr.ErrInternal
+		return "", fmt.Errorf("%w: failed reading response", domainerr.ErrAIUnavailable)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", domainerr.ErrInternal
+		// Best-effort parse OpenAI error response.
+		msg := "upstream error"
+		var decodedErr struct {
+			Error struct {
+				Message string `json:"message"`
+			} `json:"error"`
+		}
+		if err := json.Unmarshal(body, &decodedErr); err == nil {
+			if strings.TrimSpace(decodedErr.Error.Message) != "" {
+				msg = strings.TrimSpace(decodedErr.Error.Message)
+			}
+		}
+		return "", fmt.Errorf("%w: OpenAI error (%d): %s", domainerr.ErrAIUnavailable, resp.StatusCode, msg)
 	}
 
 	var decoded ChatResponse
 	if err := json.Unmarshal(body, &decoded); err != nil {
-		return "", domainerr.ErrInternal
+		return "", fmt.Errorf("%w: invalid response", domainerr.ErrAIUnavailable)
 	}
 	if len(decoded.Choices) == 0 {
-		return "", domainerr.ErrInternal
+		return "", fmt.Errorf("%w: empty response", domainerr.ErrAIUnavailable)
 	}
 
 	return decoded.Choices[0].Message.Content, nil

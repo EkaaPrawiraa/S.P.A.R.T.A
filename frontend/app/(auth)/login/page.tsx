@@ -1,10 +1,10 @@
-import { AuthForm } from '@/components/auth-form'
+import { AuthForm } from "@/components/auth-form";
 
 export const metadata = {
-  title: 'Login - Gym Dashboard',
-  description: 'Sign in to your gym dashboard',
-}
+  title: "Login - S.P.A.R.T.A",
+  description: "Sign in to S.P.A.R.T.A",
+};
 
 export default function LoginPage() {
-  return <AuthForm mode="login" />
+  return <AuthForm mode="login" />;
 }

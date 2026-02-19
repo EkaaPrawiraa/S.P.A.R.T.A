@@ -28,11 +28,10 @@ func LoadConfig() *Config {
 		RedisPass:   getEnv("REDIS_PASSWORD", ""),
 		RedisDB:     getEnvInt("REDIS_DB", 0),
 		JWTSecret:   getEnv("JWT_SECRET", "SUPER_SECRET"),
-		Port:        getEnv("APP_PORT", "8080"),
+		Port:        getEnv("APP_PORT", getEnv("PORT", "8080")),
 		AppEnv:      getEnv("APP_ENV", "local"),
 	}
 }
-
 
 func getEnv(key, fallback string) string {
 	if val, ok := os.LookupEnv(key); ok {

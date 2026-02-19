@@ -90,6 +90,7 @@ func SetupRouter(
 		splits.GET("/:id", splitHandler.GetTemplate)
 		splits.PUT("/:id", splitHandler.UpdateTemplate)
 		splits.POST("/:id/activate", splitHandler.ActivateTemplate)
+		splits.POST("/:id/deactivate", splitHandler.DeactivateTemplate)
 		splits.GET("/user/:user_id", splitHandler.GetUserTemplates)
 	}
 
@@ -123,6 +124,7 @@ func SetupRouter(
 		ai.POST("/overload", AICoachHandler.SuggestOverload)
 		ai.POST("/workout", AICoachHandler.GenerateWorkoutPlan)
 		ai.GET("/motivation", AICoachHandler.GetDailyMotivation)
+		ai.POST("/motivation/reset", AICoachHandler.ResetDailyMotivation)
 		ai.GET("/coaching", AICoachHandler.GetCoachingSuggestions)
 		ai.POST("/explain-workout", AICoachHandler.ExplainWorkoutPlan)
 	}

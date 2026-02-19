@@ -85,7 +85,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </h1>
         <p className="text-muted-foreground">
           {mode === "login"
-            ? "Sign in to your gym dashboard"
+            ? "Sign in to S.P.A.R.T.A"
             : "Join us on your fitness journey"}
         </p>
       </div>
@@ -142,7 +142,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       <div className="text-center text-sm text-muted-foreground">
         {mode === "login" ? (
           <>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-primary hover:underline">
               Sign up
             </Link>

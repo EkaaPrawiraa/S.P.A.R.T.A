@@ -37,14 +37,14 @@ export function QuickTiles({
 }: QuickTilesProps) {
   return (
     <motion.div
-      className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch"
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
     >
-      <motion.div variants={itemVariants}>
-        <Card className="bg-card hover:shadow-lg transition-shadow">
+      <motion.div variants={itemVariants} className="h-full">
+        <Card className="bg-card h-full flex flex-col hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -53,7 +53,7 @@ export function QuickTiles({
               <Dumbbell className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <div className="text-3xl font-bold text-foreground">
               {workoutsThisWeek}
             </div>
@@ -64,8 +64,8 @@ export function QuickTiles({
         </Card>
       </motion.div>
 
-      <motion.div variants={itemVariants}>
-        <Card className="bg-card hover:shadow-lg transition-shadow">
+      <motion.div variants={itemVariants} className="h-full">
+        <Card className="bg-card h-full flex flex-col hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -74,7 +74,7 @@ export function QuickTiles({
               <Apple className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <div className="text-3xl font-bold text-foreground">
               {proteinToday}g
             </div>
@@ -83,8 +83,8 @@ export function QuickTiles({
         </Card>
       </motion.div>
 
-      <motion.div variants={itemVariants}>
-        <Card className="bg-card hover:shadow-lg transition-shadow">
+      <motion.div variants={itemVariants} className="h-full">
+        <Card className="bg-card h-full flex flex-col hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -93,8 +93,8 @@ export function QuickTiles({
               <Calendar className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm font-medium text-foreground">
+          <CardContent className="mt-auto">
+            <p className="text-sm font-medium text-foreground leading-snug line-clamp-3 min-h-[3.75rem]">
               {latestRecommendation || "—"}
             </p>
           </CardContent>

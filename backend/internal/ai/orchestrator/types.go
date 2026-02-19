@@ -13,8 +13,8 @@ type SplitOutput struct {
 }
 
 type SplitDayOutput struct {
-	DayName   string              `json:"day_name"`
-	Focus     []string            `json:"focus"`
+	DayName   string                `json:"day_name"`
+	Focus     []string              `json:"focus"`
 	Exercises []SplitExerciseOutput `json:"exercises"`
 }
 

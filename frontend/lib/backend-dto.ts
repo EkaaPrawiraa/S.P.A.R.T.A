@@ -47,6 +47,7 @@ export interface WorkoutSessionResponseDTO {
 
 export interface SplitExerciseResponseDTO {
   exercise_id: string;
+  exercise_name: string;
   target_sets: number;
   target_reps: number;
   target_weight: number;

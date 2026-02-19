@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Transparent-background Spartan helmet mark (no filled background) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <style>
+    :root { color: #0a0a0a; }
+    @media (prefers-color-scheme: dark) { :root { color: #fafafa; } }
+  </style>
+  <!-- Crest -->
+  <path d="M12 3c-3.5 1.4-6 4.6-6 8.6V13" />
+  <path d="M12 3c3.5 1.4 6 4.6 6 8.6V13" />
+
+  <!-- Helmet outline -->
+  <path d="M6 13c0 5 3.2 8 6 8s6-3 6-8" />
+
+  <!-- Face guard / visor -->
+  <path d="M9 12h6" />
+  <path d="M9 12c0 2.2 1.2 4 3 4s3-1.8 3-4" />
+
+  <!-- Neck guard -->
+  <path d="M8.5 20.2V18" />
+  <path d="M15.5 20.2V18" />
+</svg>

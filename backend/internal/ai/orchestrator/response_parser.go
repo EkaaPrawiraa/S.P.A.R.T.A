@@ -2,7 +2,10 @@ package orchestrator
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
+
+	domainerr "S.P.A.R.T.A/backend/internal/domain/errors"
 )
 
 func ParseSplitResponse(resp string) (*SplitOutput, error) {
@@ -10,7 +13,7 @@ func ParseSplitResponse(resp string) (*SplitOutput, error) {
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }
@@ -20,7 +23,7 @@ func ParseWorkoutResponse(resp string) (*WorkoutOutput, error) {
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }
@@ -30,7 +33,7 @@ func ParseOverloadResponse(resp string) (*OverloadOutput, error) {
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }
@@ -40,7 +43,7 @@ func ParseMotivationResponse(resp string) (*MotivationOutput, error) {
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }
@@ -50,7 +53,7 @@ func ParseCoachingResponse(resp string) (*CoachingOutput, error) {
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }
@@ -60,7 +63,7 @@ func ParseExplainWorkoutPlanResponse(resp string) (*ExplainWorkoutPlanOutput, er
 	clean := extractJSONObject(resp)
 	err := json.Unmarshal([]byte(clean), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: invalid AI JSON", domainerr.ErrAIUnavailable)
 	}
 	return &out, nil
 }

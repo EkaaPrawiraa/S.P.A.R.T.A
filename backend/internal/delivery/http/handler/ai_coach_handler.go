@@ -116,6 +116,23 @@ func (h *AICoachHandler) GetDailyMotivation(c *gin.Context) {
 	})
 }
 
+func (h *AICoachHandler) ResetDailyMotivation(c *gin.Context) {
+	userIDStr := c.GetString("user_id")
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		response.BadRequest(c, "invalid user id")
+		return
+	}
+
+	if err := h.usecase.ResetDailyMotivation(c.Request.Context(), userID); err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	response.Success(c, gin.H{"reset": true})
+}
+
 func (h *AICoachHandler) GenerateWorkoutPlan(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 

@@ -11,6 +11,10 @@ export const FOCUS_MUSCLE_OPTIONS = [
 
 // Granular muscle list (used for exercise primary/secondary).
 export const MUSCLE_OPTIONS = [
+  "Chest",
+  "Legs",
+  "Shoulders",
+  "Arms",
   "Upper Chest",
   "Mid Chest",
   "Lower Chest",
